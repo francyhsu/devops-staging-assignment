@@ -1,21 +1,21 @@
 pipeline {
-    agent { label 'testing' }
+    agent { label 'testing' } 
     stages {
-        stage('Source Check') {
+        stage('Initial Build') {
             steps {
-                echo "Triggered automatically on branch: ${env.BRANCH_NAME}"
-            }
-        }
-        stage('Main Branch Tasks') {
-            when { branch 'main' } // Requirement: branch-specific behavior
-            steps {
-                echo "Running Staging environment deployment..."
+                echo "Running on branch: ${env.BRANCH_NAME}"
             }
         }
         stage('Feature Branch Tasks') {
             when { not { branch 'main' } } 
             steps {
-                echo "Running feature branch tests..."
+                echo "Executing experimental feature tests..."
+            }
+        }
+        stage('Main Branch Staging') {
+            when { branch 'main' } 
+            steps {
+                echo "Executing production-ready staging deployment..."
             }
         }
     }
