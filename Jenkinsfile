@@ -1,21 +1,21 @@
 pipeline {
     agent { label 'testing' }
     stages {
-        stage('Source Integration') {
+        stage('Source Check') {
             steps {
-                echo "Triggered by GitHub on branch: ${env.BRANCH_NAME}"
+                echo "Triggered automatically on branch: ${env.BRANCH_NAME}"
             }
         }
-        stage('Feature Testing') {
-            when { not { branch 'main' } } // Runs only for non-main branches
+        stage('Main Branch Tasks') {
+            when { branch 'main' } // Requirement: branch-specific behavior
             steps {
-                echo "Experimental feature testing in progress..."
+                echo "Running Staging environment deployment..."
             }
         }
-        stage('Staging Quality Check') {
-            when { branch 'main' } // Runs only for the main branch
+        stage('Feature Branch Tasks') {
+            when { not { branch 'main' } } 
             steps {
-                echo "Running production-ready checks for Staging..."
+                echo "Running feature branch tests..."
             }
         }
     }
