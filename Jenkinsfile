@@ -5,7 +5,7 @@ pipeline {
         // Semantic Versioning for Question 4
         APP_VERSION = "1.0.${env.BUILD_NUMBER}"
         // Token for Question 5
-        SONAR_TOKEN = "PASTE_YOUR_SONAR_TOKEN_HERE"
+        SONAR_TOKEN = "squ_d4470a13cff889e2b9b3ed747bab14d145ee3c93"
     }
 
     stages {
