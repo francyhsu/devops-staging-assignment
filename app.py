@@ -1,14 +1,16 @@
 from fastapi import FastAPI
-import os
+from pydantic import BaseModel
 
 app = FastAPI()
 
+class User(BaseModel):
+    username: str
+    email: str
+
 @app.get("/health")
 def health_check():
-    """Endpoint 1: Health Check"""
-    return {"status": "healthy", "environment": "staging", "version": os.getenv("APP_VERSION", "1.0.0")}
+    return {"status": "healthy"}
 
 @app.post("/users")
-def create_user(username: str, email: str):
-    """Endpoint 2: User Creation (Interacts with database logic)"""
-    return {"message": f"User {username} with email {email} created successfully in the staging database."}
+def create_user(user: User):
+    return {"message": f"User {user.username} created successfully."}
