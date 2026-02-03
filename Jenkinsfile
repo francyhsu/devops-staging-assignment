@@ -1,43 +1,43 @@
-pipeline {
+pipeline { 
     agent { label 'testing' } 
-    
-    // This allows the build to trigger even if there's a minor environmental delay
-    options {
-        disableConcurrentBuilds()
-    }
-
-    stages {
-        stage('Source Integration') {
-            steps {
-                echo "Successfully triggered by GitHub Webhook."
-                echo "Current Build Branch: ${env.BRANCH_NAME}"
-            }
-        }
-
-        stage('Feature Branch Tasks') {
-            when { 
-                not { branch 'main' } 
+    environment { 
+        // Requirement: Semantic versioning using build numbers
+        APP_VERSION = "1.0.${env.BUILD_NUMBER}" 
+    } 
+    stages { 
+        stage('Source Integration') { 
+            steps { 
+                echo "Triggered by GitHub. Branch: ${env.BRANCH_NAME}" 
             } 
-            steps {
-                echo "DEBUG: Non-main branch detected (${env.BRANCH_NAME})."
-                echo "Executing experimental feature tests for development..."
-            }
-        }
-
-        stage('Main Branch Staging') {
-            when { 
-                branch 'main' 
+        } 
+        stage('Build and Package') { 
+            steps { 
+                echo "Packaging Application v${env.APP_VERSION}..." 
+                // 1. Create a clean build directory 
+                sh "mkdir -p build" 
+                // 2. Prepare the artifacts (App code and Database schema) 
+                sh "cp app.py schema.sql build/" 
+                // 3. Package into a versioned ZIP file (Semantic Versioning) 
+                sh "zip -r build/staging-app-v${env.APP_VERSION}.zip build/" 
+                // 4. Requirement: Store artifacts in Jenkins
+                archiveArtifacts artifacts: 'build/*.zip', fingerprint: true 
             } 
-            steps {
-                echo "DEBUG: Main branch detected."
-                echo "Executing production-ready staging deployment tasks..."
-            }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline execution finished on ${env.NODE_NAME}."
-        }
-    }
+        } 
+        stage('Branch Specific Tasks') { 
+            steps { 
+                script { 
+                    if(env.BRANCH_NAME == 'main') { 
+                        echo "Main branch detected: Preparing for Staging Deployment." 
+                    } else { 
+                        echo "Feature branch detected: Running experimental tests." 
+                    } 
+                } 
+            } 
+        } 
+    } 
+    post { 
+        success { 
+            echo "Successfully built and archived version ${env.APP_VERSION}" 
+        } 
+    } 
 }
